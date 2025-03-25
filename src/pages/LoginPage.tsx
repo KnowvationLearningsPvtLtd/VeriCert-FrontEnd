@@ -1,6 +1,3 @@
-
-
-
 // PAGE
 // header
 // form

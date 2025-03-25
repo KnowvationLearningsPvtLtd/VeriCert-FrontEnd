@@ -46,6 +46,9 @@ export default tseslint.config({
   },
 })
 ```
+
 =======
+
 # VeriCert-FrontEnd
->>>>>>> origin/main
+
+> > > > > > > origin/main
