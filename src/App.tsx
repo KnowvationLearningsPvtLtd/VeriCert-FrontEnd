@@ -5,11 +5,6 @@ function App() {
   return (
     <>
       <Router />
-
-
-
-
-      
     </>
   )
 }
