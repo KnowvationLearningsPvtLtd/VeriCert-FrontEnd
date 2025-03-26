@@ -1,4 +1,14 @@
 /** @type {import('tailwindcss').Config} */
+<<<<<<< HEAD
+module.exports = {
+  content: ["./index.html", "./src/**/*.{js,jsx,ts,tsx}"],
+  darkMode: "class",
+  theme: {
+    extend: {},
+  },
+  plugins: [],
+};
+=======
 import defaultTheme from 'tailwindcss/defaultTheme'
 import colors from 'tailwindcss/colors'
 import flattenColorPalette from 'tailwindcss/lib/util/flattenColorPalette'
@@ -71,3 +81,4 @@ function addVariablesForColors({ addBase, theme }) {
     ':root': newVars,
   })
 }
+>>>>>>> origin/main
