@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 
 
 
@@ -9,3 +10,10 @@ export interface AuthUser {
     
     role: 'admin' | 'issuer' | 'user'
 }
+=======
+export interface AuthUser {
+  email: string
+
+  role: 'admin' | 'issuer' | 'user'
+}
+>>>>>>> origin/main

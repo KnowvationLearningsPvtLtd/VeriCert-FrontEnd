@@ -5,11 +5,18 @@
     { "path": "./tsconfig.node.json" }
   ],
   "compilerOptions": {
+<<<<<<< HEAD
     "resolveJsonModule": true,
     "esModuleInterop": true,
+=======
+>>>>>>> origin/main
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"]
     }
   }
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> origin/main

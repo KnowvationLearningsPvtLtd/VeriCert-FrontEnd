@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import UserLayout from "./features/dashboard/components/UserLayout";
 import IssuerLayout from "./features/dashboard/components/IssuerLayout";
@@ -40,3 +41,22 @@ function App() {
 }
 
 export default App;
+=======
+import './App.css'
+import { Router } from './router'
+
+function App() {
+  return (
+    <>
+      <Router />
+
+
+
+
+      
+    </>
+  )
+}
+
+export default App
+>>>>>>> origin/main

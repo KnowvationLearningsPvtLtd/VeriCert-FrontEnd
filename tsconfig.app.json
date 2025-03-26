@@ -21,6 +21,7 @@
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
     "noUncheckedSideEffectImports": true,
+<<<<<<< HEAD
     
     "baseUrl": ".",
     "paths": {
@@ -30,4 +31,13 @@
     }
   },
   "include": ["src", "postcss.config.js"]
+=======
+
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"]
+    }
+  },
+  "include": ["src"]
+>>>>>>> origin/main
 }

@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 
 
 
@@ -5,3 +6,9 @@
 // header
 // form
 // <footer />
+=======
+// PAGE
+// header
+// form
+// <footer />
+>>>>>>> origin/main
