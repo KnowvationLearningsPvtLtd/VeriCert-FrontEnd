@@ -10,10 +10,18 @@ import IssuerDashboard from "./pages/IssuerDashboard";
 import IssuerCertificates from "./pages/IssuerCertificates";
 import IssuerApprovals from "./pages/IssuerApprovals";
 import CertificateSettings from "./pages/CertificateSettings";
+import Login from './pages/LoginPage';
+import Signup from './pages/SignupPage';
+import Home from './pages/HomePage';
 
 function App() {
   return (
     <BrowserRouter>
+      <Routes>
+        <Route path="/Signup" element={<Signup />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/home" element={<Home />} />
+      </Routes>
       <Routes>
         {/* 🟢 User Routes */}
         <Route path="/user" element={<UserLayout />}>
@@ -34,7 +42,7 @@ function App() {
         </Route>
 
         {/* Default Redirect */}
-        <Route path="*" element={<Navigate to="/user/dashboard" />} />
+        {/* <Route path="*" element={<Navigate to="/login" />} /> */}
       </Routes>
     </BrowserRouter>
   );
