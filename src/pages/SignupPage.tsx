@@ -1,7 +1,10 @@
 import React, { useState, FormEvent, ChangeEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { useSetRecoilState } from "recoil";
+import { authState } from "../store/authAtom";
 import { CheckCircle } from "lucide-react";
+import { AuthUser } from '@/types/authTypes';
 
 const Signup: React.FC = () => {
   const [username, setUsername] = useState<string>('');
@@ -9,18 +12,42 @@ const Signup: React.FC = () => {
   const [role, setRole] = useState<string>('user'); // Default role
   const [password, setPassword] = useState<string>('');
   const navigate = useNavigate();
+  const setAuth = useSetRecoilState(authState);
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
-      await axios.post('http://localhost:2000/api/auth/register', { username, email, password, role });
-      navigate('/login');
+      const response = await axios.post('http://localhost:2000/api/auth/register', {
+        username,
+        email,
+        password,
+        role,
+      });
+
+      if (response.data.status === 'success') {
+        const user: AuthUser = {
+          id: response.data.user.id,
+          username: response.data.user.username,
+          email: response.data.user.email,
+          role: response.data.user.role,
+        };
+        setAuth({
+          isAuthenticated: true,
+          user: user,
+          token: response.data.token,
+        });
+
+        localStorage.setItem("token", response.data.token);
+        navigate("/home");
+      } else {
+        alert(response.data.message || "Signup failed. Please try again.");
+      }
     } catch (err) {
       console.error("Signup error:", err);
-      alert("Registration failed. Please try again.");
+      alert("An error occurred. Please check your details and try again.");
     }
   };
-
+     
   return (
     <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-blue-300 via-blue-100 to-blue-300">
       <div className="w-full max-w-md">

@@ -4,8 +4,18 @@ import { recoilPersist } from 'recoil-persist'
 
 const { persistAtom } = recoilPersist()
 
-export const authState = atom<AuthUser | null>({
+export type AuthState = {
+  isAuthenticated: boolean;
+  user: AuthUser | null;
+  token: string;
+};
+
+export const authState = atom<AuthState>({
   key: 'authState',
-  default: null,
+  default: {
+    isAuthenticated: false,
+    user: null,
+    token: '',
+  },
   effects_UNSTABLE: [persistAtom],
-})
+});
