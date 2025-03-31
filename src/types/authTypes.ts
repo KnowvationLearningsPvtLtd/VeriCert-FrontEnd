@@ -1,5 +1,12 @@
-export interface AuthUser {
-  email: string
+export type AuthUser = {
+  id: string;
+  username: string;
+  email: string;
+  role: string;
+};
 
-  role: 'admin' | 'issuer' | 'user'
-}
+export type AuthState = {
+  isAuthenticated: boolean;
+  user: AuthUser | null;
+  token: string;
+};

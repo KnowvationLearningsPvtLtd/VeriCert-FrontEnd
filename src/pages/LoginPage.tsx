@@ -1,25 +1,55 @@
 import React, { useState, FormEvent, ChangeEvent } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { CheckCircle } from "lucide-react"
+import { useSetRecoilState } from "recoil";
+import { authState } from "../store/authAtom";
+import { CheckCircle } from "lucide-react";
+import { AuthUser } from "@/types/authTypes";
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
   const navigate = useNavigate();
+  const setAuth = useSetRecoilState(authState);
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
       const response = await axios.post('http://localhost:2000/api/auth/login', { email, password });
-      
-      if (response.data === 'Success' || response.data.status === 'success') {
-        navigate('/home');
+      console.log("Login Response:", response.data);
+      if (response.status === 200 && response.data.token) {
+        const user: AuthUser = {
+          id: response.data.user._id,
+          username: response.data.user.username,
+          email: response.data.user.email,
+          role: response.data.user.role,
+        };
+
+        setAuth({
+          isAuthenticated: true,
+          user: user,
+          token: response.data.token,
+        });
+        console.log("Updated Auth State:", {
+          isAuthenticated: true,
+          user: {
+            id: response.data?.user?._id,
+            username: response.data?.user?.username,
+            email: response.data?.user?.email,
+            role: response.data?.user?.role,
+          },
+          token: response.data?.token,
+        });
+        
+
+        localStorage.setItem("token", response.data.token);
+        navigate("/home",{ replace: true });
+        console.log("Navigating to home...");
       } else {
         alert(response.data.message || "Login failed. Please try again.");
       }
     } catch (err) {
-      console.error("Login error:", err);
+      console.error("Login error:", err.response?.data || err.message);
       alert("An error occurred. Please check your credentials and try again.");
     }
   };
@@ -73,7 +103,7 @@ const Login: React.FC = () => {
         </form>
         
         <p className="text-center text-sm text-gray-600 mt-4">
-          Don't have an account? <Link to="/Signup" className="text-blue-600 hover:underline">Register</Link>
+          Don't have an account? <Link to="/signup" className="text-blue-600 hover:underline">Register</Link>
         </p>
       </div>
     </div>
