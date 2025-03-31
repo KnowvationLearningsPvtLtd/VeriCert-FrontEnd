@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Menu } from "@headlessui/react";
 import { Search, Bell, User, LogOut, Settings } from "lucide-react";
+import Logout from "./Logout";
 
 type Notification = {
   id: number;
@@ -13,6 +14,8 @@ const Navbar: React.FC = () => {
     { id: 2, text: "User requested verification" },
     { id: 3, text: "New user registered" },
   ]);
+
+  const [showLogout, setShowLogout] = useState(false); 
 
   return (
     <div className="flex items-center justify-between bg-gray-800 text-white p-4 shadow-md">
@@ -83,6 +86,7 @@ const Navbar: React.FC = () => {
                   className={`flex items-center p-2 w-full ${
                     active ? "bg-gray-100" : ""
                   }`}
+                  onClick={() => setShowLogout(true)}
                 >
                   <LogOut size={18} className="mr-2" /> Logout
                 </button>
@@ -91,6 +95,7 @@ const Navbar: React.FC = () => {
           </Menu.Items>
         </Menu>
       </div>
+      {showLogout && <Logout />}
     </div>
   );
 };
