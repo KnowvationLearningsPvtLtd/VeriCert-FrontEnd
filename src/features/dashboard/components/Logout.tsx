@@ -13,12 +13,13 @@ const Logout = () => {
   const handleLogout = async () => {
     try {
         await axios.post("http://localhost:2000/api/auth/logout");
+        localStorage.removeItem("auth");
     setAuth({
       isAuthenticated: false,
       user: null,
       token: '',
     });
-
+    
     localStorage.removeItem("token"); // ✅ Clear token from local storage
     console.log("User logged out");
 

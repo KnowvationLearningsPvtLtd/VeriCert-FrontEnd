@@ -2,6 +2,8 @@ import { useState } from "react";
 import { Menu } from "@headlessui/react";
 import { Search, Bell, User, LogOut, Settings } from "lucide-react";
 import Logout from "./Logout";
+import { useRecoilValue } from "recoil";
+import { authState } from "../../../store/authAtom"; // ✅ adjust if needed
 
 type Notification = {
   id: number;
@@ -15,7 +17,10 @@ const Navbar: React.FC = () => {
     { id: 3, text: "New user registered" },
   ]);
 
-  const [showLogout, setShowLogout] = useState(false); 
+  const [showLogout, setShowLogout] = useState(false);
+
+  const auth = useRecoilValue(authState);
+  const username = auth?.user?.username || "User"; // ✅ dynamic name
 
   return (
     <div className="flex items-center justify-between bg-gray-800 text-white p-4 shadow-md">
@@ -31,7 +36,7 @@ const Navbar: React.FC = () => {
 
       {/* Notification & Profile */}
       <div className="flex items-center gap-6">
-        {/* Notification Dropdown */}
+        {/* Notifications */}
         <Menu as="div" className="relative">
           <Menu.Button className="relative">
             <Bell size={24} />
@@ -46,11 +51,7 @@ const Navbar: React.FC = () => {
               notifications.map((n) => (
                 <Menu.Item key={n.id}>
                   {({ active }) => (
-                    <div
-                      className={`p-2 border-b ${
-                        active ? "bg-gray-100" : ""
-                      }`}
-                    >
+                    <div className={`p-2 border-b ${active ? "bg-gray-100" : ""}`}>
                       {n.text}
                     </div>
                   )}
@@ -66,15 +67,13 @@ const Navbar: React.FC = () => {
         <Menu as="div" className="relative">
           <Menu.Button className="flex items-center gap-2 cursor-pointer">
             <User size={24} />
-            <span className="hidden md:inline">John Doe</span>
+            <span className="hidden md:inline">{username}</span> {/* ✅ Replaced */}
           </Menu.Button>
           <Menu.Items className="absolute right-0 mt-2 w-48 bg-white text-black shadow-lg rounded-lg overflow-hidden">
             <Menu.Item>
               {({ active }) => (
                 <button
-                  className={`flex items-center p-2 w-full ${
-                    active ? "bg-gray-100" : ""
-                  }`}
+                  className={`flex items-center p-2 w-full ${active ? "bg-gray-100" : ""}`}
                 >
                   <Settings size={18} className="mr-2" /> Settings
                 </button>
@@ -83,9 +82,7 @@ const Navbar: React.FC = () => {
             <Menu.Item>
               {({ active }) => (
                 <button
-                  className={`flex items-center p-2 w-full ${
-                    active ? "bg-gray-100" : ""
-                  }`}
+                  className={`flex items-center p-2 w-full ${active ? "bg-gray-100" : ""}`}
                   onClick={() => setShowLogout(true)}
                 >
                   <LogOut size={18} className="mr-2" /> Logout
@@ -95,6 +92,7 @@ const Navbar: React.FC = () => {
           </Menu.Items>
         </Menu>
       </div>
+
       {showLogout && <Logout />}
     </div>
   );

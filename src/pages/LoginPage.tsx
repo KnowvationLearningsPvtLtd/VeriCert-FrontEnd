@@ -27,9 +27,19 @@ const Login: React.FC = () => {
 
         setAuth({
           isAuthenticated: true,
-          user: user,
+          user: response.data.user,
           token: response.data.token,
         });
+
+        localStorage.setItem(
+          "auth",
+          JSON.stringify({
+            isAuthenticated: true,
+            user,
+            token: response.data.token,
+          })
+        );
+        
         console.log("Updated Auth State:", {
           isAuthenticated: true,
           user: {
@@ -41,25 +51,28 @@ const Login: React.FC = () => {
           token: response.data?.token,
         });
         
-
-        localStorage.setItem("token", response.data.token);
-        navigate("/home",{ replace: true });
-        console.log("Navigating to home...");
-      } else {
-        alert(response.data.message || "Login failed. Please try again.");
+        console.log("Updated Auth State:", user);
+       
+        // Redirect based on role
+        if (user.role === "user") {
+          console.log("Navigating to /user/dashboard...");
+          navigate("/user/dashboard");
+        } else if (user.role === "issuer" || user.role === "organization") {
+          console.log("Navigating to /issuer/dashboard...");
+          navigate("/issuer/dashboard");
+        } else {
+          console.log("Invalid role. Redirecting to login.");
+          navigate("/login");
+        }
       }
-    } catch (err) {
-      console.error("Login error:", err.response?.data || err.message);
-      alert("An error occurred. Please check your credentials and try again.");
+    } catch (error) {
+      console.error("Login failed:", error);
     }
   };
+        
 
   return (
-    
-   
-          
-    //<div className="flex items-center justify-center min-h-screen bg-gray-100">
-       <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-blue-300 via-blue-100 to-blue-300">
+    <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-blue-300 via-blue-100 to-blue-300">
       <div className="w-full max-w-md">
         <div className="flex items-center justify-center mb-6">
           <CheckCircle className="h-8 w-8 text-blue-600 mr-2" />
@@ -108,8 +121,6 @@ const Login: React.FC = () => {
       </div>
     </div>
     </div>
-    //</div>
-    
   );
 };
 
