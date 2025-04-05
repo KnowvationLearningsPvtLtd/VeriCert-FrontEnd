@@ -1,4 +1,3 @@
-
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import UserLayout from "./features/dashboard/components/UserLayout";
 import IssuerLayout from "./features/dashboard/components/IssuerLayout";
@@ -10,21 +9,34 @@ import IssuerDashboard from "./pages/IssuerDashboard";
 import IssuerCertificates from "./pages/IssuerCertificates";
 import IssuerApprovals from "./pages/IssuerApprovals";
 import CertificateSettings from "./pages/CertificateSettings";
-import Login from './pages/LoginPage';
-import Signup from './pages/SignupPage';
-import Home from './pages/HomePage';
+import Login from "./pages/LoginPage";
+import Signup from "./pages/SignupPage";
+import ProtectedRoute from "./middleware/ProtectedRoute";
+import RoleBasedRoute from "./middleware/RoleBasedRoute";
+import AuthGuard from "../src/features/dashboard/components/AuthGuard";
+
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
-        <Route path="/Signup" element={<Signup />} />
+        {/* 🔓 Public Routes */}
+        <Route path="/signup" element={<Signup />} />
         <Route path="/login" element={<Login />} />
-        <Route path="/home" element={<Home />} />
-      </Routes>
-      <Routes>
+
         {/* 🟢 User Routes */}
-        <Route path="/user" element={<UserLayout />}>
+        <Route
+          path="/user/*"
+          element={
+            <AuthGuard>
+            <ProtectedRoute>
+              <RoleBasedRoute allowedRoles={["user"]}>
+                <UserLayout />
+              </RoleBasedRoute>
+            </ProtectedRoute>
+            </AuthGuard>
+          }
+        >
           <Route path="dashboard" element={<UserDashboard />} />
           <Route path="certificates" element={<CertificateSettings />} />
           <Route path="analytics" element={<Analytics />} />
@@ -34,19 +46,29 @@ function App() {
         </Route>
 
         {/* 🔵 Issuer Routes */}
-        <Route path="/issuer" element={<IssuerLayout />}>
+        <Route
+          path="/issuer/*"
+          element={
+            <AuthGuard>
+            <ProtectedRoute>
+              <RoleBasedRoute allowedRoles={['issuer', 'organization']}>
+                <IssuerLayout />
+              </RoleBasedRoute>
+            </ProtectedRoute>
+            </AuthGuard>
+          }
+        >
           <Route path="dashboard" element={<IssuerDashboard />} />
           <Route path="certificates" element={<IssuerCertificates />} />
           <Route path="approvals" element={<IssuerApprovals />} />
           <Route path="*" element={<Navigate to="/issuer/dashboard" />} />
         </Route>
 
-        {/* Default Redirect */}
-        {/* <Route path="*" element={<Navigate to="/login" />} /> */}
+        {/* 🌐 Catch-All Redirect */}
+        <Route path="*" element={<Navigate to="/login" />} />
       </Routes>
     </BrowserRouter>
   );
 }
 
 export default App;
-
