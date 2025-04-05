@@ -14,12 +14,15 @@ import Signup from "./pages/SignupPage";
 import ProtectedRoute from "./middleware/ProtectedRoute";
 import RoleBasedRoute from "./middleware/RoleBasedRoute";
 import AuthGuard from "../src/features/dashboard/components/AuthGuard";
-
+import LandingPage from "../src/pages/LandingPage";
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
+        {/* 🏠 Default Public Landing Page */}
+        <Route path="/" element={<LandingPage />} />
+      
         {/* 🔓 Public Routes */}
         <Route path="/signup" element={<Signup />} />
         <Route path="/login" element={<Login />} />
@@ -29,11 +32,11 @@ function App() {
           path="/user/*"
           element={
             <AuthGuard>
-            <ProtectedRoute>
-              <RoleBasedRoute allowedRoles={["user"]}>
-                <UserLayout />
-              </RoleBasedRoute>
-            </ProtectedRoute>
+              <ProtectedRoute>
+                <RoleBasedRoute allowedRoles={["user"]}>
+                  <UserLayout />
+                </RoleBasedRoute>
+              </ProtectedRoute>
             </AuthGuard>
           }
         >
@@ -50,11 +53,11 @@ function App() {
           path="/issuer/*"
           element={
             <AuthGuard>
-            <ProtectedRoute>
-              <RoleBasedRoute allowedRoles={['issuer', 'organization']}>
-                <IssuerLayout />
-              </RoleBasedRoute>
-            </ProtectedRoute>
+              <ProtectedRoute>
+                <RoleBasedRoute allowedRoles={["issuer", "organization"]}>
+                  <IssuerLayout />
+                </RoleBasedRoute>
+              </ProtectedRoute>
             </AuthGuard>
           }
         >
@@ -64,8 +67,8 @@ function App() {
           <Route path="*" element={<Navigate to="/issuer/dashboard" />} />
         </Route>
 
-        {/* 🌐 Catch-All Redirect */}
-        <Route path="*" element={<Navigate to="/login" />} />
+        {/* 🌐 Catch-All Redirect to Landing Page */}
+        <Route path="*" element={<Navigate to="/" />} />
       </Routes>
     </BrowserRouter>
   );

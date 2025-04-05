@@ -19,7 +19,7 @@ const RoleBasedRoute = ({ allowedRoles, children }: RoleBasedRouteProps) => {
   return role && allowedRoles.includes(role) ? (
     children
   ) : (
-    <Navigate to="/login" />
+    <Navigate to="/" />
   );
 };
 

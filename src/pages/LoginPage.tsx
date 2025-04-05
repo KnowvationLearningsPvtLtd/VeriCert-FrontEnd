@@ -31,14 +31,6 @@ const Login: React.FC = () => {
           token: response.data.token,
         });
 
-        localStorage.setItem(
-          "auth",
-          JSON.stringify({
-            isAuthenticated: true,
-            user,
-            token: response.data.token,
-          })
-        );
         
         console.log("Updated Auth State:", {
           isAuthenticated: true,
@@ -62,7 +54,7 @@ const Login: React.FC = () => {
           navigate("/issuer/dashboard");
         } else {
           console.log("Invalid role. Redirecting to login.");
-          navigate("/login");
+          navigate("/");
         }
       }
     } catch (error) {

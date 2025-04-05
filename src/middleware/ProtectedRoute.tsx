@@ -14,7 +14,7 @@ const ProtectedRoute = ({ children }: Props) => {
   console.log("ProtectedRoute - isAuthenticated:", isAuthenticated);
 
   if (!isAuthenticated) {
-    return <Navigate to="/login" replace state={{ from: location }} />;
+    return <Navigate to="/" replace state={{ from: location }} />;
   }
 
   return <>{children}</>;

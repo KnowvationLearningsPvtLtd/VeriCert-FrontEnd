@@ -14,11 +14,11 @@ const PrivateRoute = ({
   children,
 }: PrivateRouteProps) => {
   if (!isAuthenticated) {
-    return <Navigate to="/login" />;
+    return <Navigate to="/" />;
   }
 
   if (userRole && !allowedRoles.includes(userRole.toLowerCase())) {
-    return <Navigate to="/login" />;
+    return <Navigate to="/" />;
   }
 
   return children;

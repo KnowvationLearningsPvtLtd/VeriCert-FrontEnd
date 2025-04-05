@@ -10,32 +10,9 @@ export type AuthState = {
   token: string;
 };
 
-// ✅ Type guard to validate parsed object
-const isValidAuthState = (data: any): data is AuthState => {
-  return (
-    typeof data === 'object' &&
-    data !== null &&
-    'isAuthenticated' in data &&
-    'user' in data &&
-    'token' in data
-  );
-};
-
-let storedAuth: AuthState | null = null;
-
-try {
-  const raw = localStorage.getItem('auth');
-  const parsed = JSON.parse(raw || 'null');
-  if (isValidAuthState(parsed)) {
-    storedAuth = parsed;
-  }
-} catch {
-  storedAuth = null;
-}
-
 export const authState = atom<AuthState>({
   key: 'authState',
-  default: storedAuth || {
+  default: {
     isAuthenticated: false,
     user: null,
     token: '',
