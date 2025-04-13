@@ -15,6 +15,8 @@ import ProtectedRoute from "./middleware/ProtectedRoute";
 import RoleBasedRoute from "./middleware/RoleBasedRoute";
 import AuthGuard from "../src/features/dashboard/components/AuthGuard";
 import LandingPage from "../src/pages/LandingPage";
+import Editor from "./components/certificate-editor/Editor";
+import TemplateSelection from "./components/certificate-editor/TemplateSelection";
 
 function App() {
   return (
@@ -64,6 +66,8 @@ function App() {
           <Route path="dashboard" element={<IssuerDashboard />} />
           <Route path="certificates" element={<IssuerCertificates />} />
           <Route path="approvals" element={<IssuerApprovals />} />
+          <Route path="certificate-editor" element={<TemplateSelection />} />
+          <Route path="certificate-editor/:templateId" element={<Editor />} />
           <Route path="*" element={<Navigate to="/issuer/dashboard" />} />
         </Route>
 
