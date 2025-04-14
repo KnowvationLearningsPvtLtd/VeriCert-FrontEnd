@@ -3,7 +3,8 @@ import { Menu } from "@headlessui/react";
 import { Search, Bell, User, LogOut, Settings } from "lucide-react";
 import Logout from "./Logout";
 import { useRecoilValue } from "recoil";
-import { authState } from "../../../store/authAtom"; // ✅ adjust if needed
+import { authState } from "../../../store/authAtom"; 
+import { useNavigate } from "react-router-dom";
 
 type Notification = {
   id: number;
@@ -11,6 +12,8 @@ type Notification = {
 };
 
 const Navbar: React.FC = () => {
+  const navigate = useNavigate();
+
   const [notifications] = useState<Notification[]>([
     { id: 1, text: "New certificate issued" },
     { id: 2, text: "User requested verification" },
@@ -18,9 +21,8 @@ const Navbar: React.FC = () => {
   ]);
 
   const [showLogout, setShowLogout] = useState(false);
-
   const auth = useRecoilValue(authState);
-  const username = auth?.user?.username || "User"; // ✅ dynamic name
+  const username = auth?.user?.username || "User";
 
   return (
     <div className="flex items-center justify-between bg-gray-800 text-white p-4 shadow-md">
@@ -46,7 +48,7 @@ const Navbar: React.FC = () => {
               </span>
             )}
           </Menu.Button>
-          <Menu.Items className="absolute right-0 mt-2 w-56 bg-white text-black shadow-lg rounded-lg overflow-hidden">
+          <Menu.Items className="absolute right-0 mt-2 w-56 bg-white text-black shadow-lg rounded-lg overflow-hidden z-10">
             {notifications.length > 0 ? (
               notifications.map((n) => (
                 <Menu.Item key={n.id}>
@@ -67,13 +69,14 @@ const Navbar: React.FC = () => {
         <Menu as="div" className="relative">
           <Menu.Button className="flex items-center gap-2 cursor-pointer">
             <User size={24} />
-            <span className="hidden md:inline">{username}</span> {/* ✅ Replaced */}
+            <span className="hidden md:inline">{username}</span>
           </Menu.Button>
-          <Menu.Items className="absolute right-0 mt-2 w-48 bg-white text-black shadow-lg rounded-lg overflow-hidden">
+          <Menu.Items className="absolute right-0 mt-2 w-48 bg-white text-black shadow-lg rounded-lg overflow-hidden z-10">
             <Menu.Item>
               {({ active }) => (
                 <button
                   className={`flex items-center p-2 w-full ${active ? "bg-gray-100" : ""}`}
+                  onClick={() => navigate("/user/profile")}
                 >
                   <Settings size={18} className="mr-2" /> Settings
                 </button>
@@ -93,6 +96,7 @@ const Navbar: React.FC = () => {
         </Menu>
       </div>
 
+      {/* Logout Confirmation Modal */}
       {showLogout && <Logout />}
     </div>
   );

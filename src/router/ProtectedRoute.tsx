@@ -1,9 +1,16 @@
-import { authState } from '@/store/authAtom'
-import { Navigate, Outlet } from 'react-router-dom'
-import { useRecoilValue } from 'recoil'
+import { authState } from '@/store/authAtom';
+import { Navigate, Outlet } from 'react-router-dom';
+import { useRecoilValue } from 'recoil';
 
-export const ProtectedRoute = () => {
-  const authUser = useRecoilValue(authState)
+const ProtectedRoute = () => {
+  const authUser = useRecoilValue(authState);
 
-  return authUser ? <Outlet /> : <Navigate to="/" />
-}
+  // ✅ Properly check if user is authenticated
+  if (!authUser.isAuthenticated || !authUser.token) {
+    return <Navigate to="/" replace />;
+  }
+
+  return <Outlet />;
+};
+
+export default ProtectedRoute;
