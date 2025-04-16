@@ -1,48 +1,186 @@
-import { useState } from "react";
+import { useState, createContext, useContext } from "react";
 import { Link } from "react-router-dom";
-import { Menu, X, LayoutDashboard, FileText, BarChart3, Settings } from "lucide-react";
-import { HomeIcon } from "@heroicons/react/24/outline";
+import { motion, AnimatePresence } from "framer-motion";
+import {
+  Menu,
+  X,
+  LayoutDashboard,
+  FileText,
+  BarChart3,
+  Settings,
+} from "lucide-react";
+
+// Sidebar Context
+const SidebarContext = createContext<{
+  open: boolean;
+  setOpen: React.Dispatch<React.SetStateAction<boolean>>;
+} | null>(null);
+
+const useSidebar = () => {
+  const context = useContext(SidebarContext);
+  if (!context) {
+    throw new Error("Sidebar must be used inside SidebarProvider");
+  }
+  return context;
+};
+
+const SidebarProvider = ({ children }: { children: React.ReactNode }) => {
+  const [open, setOpen] = useState(true);
+  return (
+    <SidebarContext.Provider value={{ open, setOpen }}>
+      {children}
+    </SidebarContext.Provider>
+  );
+};
 
 const Sidebar: React.FC = () => {
-  const [isOpen, setIsOpen] = useState<boolean>(true);
+  return (
+    <SidebarProvider>
+      <DesktopSidebar />
+      <MobileSidebar />
+    </SidebarProvider>
+  );
+};
+
+// Desktop Sidebar
+const DesktopSidebar = () => {
+  const { open, setOpen } = useSidebar();
 
   return (
-    <div className={`h-full min-h-screen bg-gray-900 text-white ${isOpen ? "w-64" : "w-20"} transition-all duration-300 p-4 flex flex-col justify-between`}>
+    <motion.div
+      className="hidden md:flex flex-col justify-between h-screen bg-[#5C4033] text-white p-4 transition-all duration-300"
+      animate={{ width: open ? 250 : 70 }}
+      onMouseEnter={() => setOpen(true)}
+      onMouseLeave={() => setOpen(false)}
+    >
+      {/* Top */}
+      <div>
+        {open && (
+          <motion.span
+            animate={{ opacity: open ? 1 : 0 }}
+            className="text-xl font-bold mb-6 block"
+          >
+            Certificate Dashboard
+          </motion.span>
+        )}
 
-      {/* Top Section (Button & Title) */}
-      <div className="p-4">
-        <button className="text-white mb-4" onClick={() => setIsOpen(!isOpen)}>
-          {isOpen ? <X size={24} /> : <Menu size={24} />}
-        </button>
-        <div className="flex items-center justify-center mb-1">
-        <span className="text-xl font-bold flex items-center gap-2">
-  <HomeIcon className="h-6 w-6" /> {/* HeroIcons Home */}
-  {isOpen && <span className="leading-none">Certificate Dashboard</span>}
-</span>
-        </div>
+        {/* Navigation */}
+        <nav className="space-y-2">
+          <SidebarLink
+            to="/user/dashboard"
+            Icon={LayoutDashboard}
+            label="Dashboard"
+          />
+          <SidebarLink
+            to="/user/certificates"
+            Icon={FileText}
+            label="Certificates"
+          />
+          <SidebarLink
+            to="/user/analytics"
+            Icon={BarChart3}
+            label="Analytics"
+          />
+          <SidebarLink
+            to="/user/settings"
+            Icon={Settings}
+            label="Settings"
+          />
+        </nav>
       </div>
 
-      {/* Navigation */}
-      <nav className="flex-1 space-y-2">
-        <Link to="/user/dashboard" className="flex items-center gap-4 px-4 py-3 hover:bg-gray-800 rounded-lg">
-          <LayoutDashboard size={20} /> {isOpen && "Dashboard"}
-        </Link>
-        <Link to="/user/certificates" className="flex items-center gap-4 px-4 py-3 hover:bg-gray-800 rounded-lg">
-          <FileText size={20} /> {isOpen && "Certificates"}
-        </Link>
-        <Link to="/user/analytics" className="flex items-center gap-4 px-4 py-3 hover:bg-gray-800 rounded-lg">
-          <BarChart3 size={20} /> {isOpen && "Analytics"}
-        </Link>
-        <Link to="/user/settings" className="flex items-center gap-4 px-4 py-3 hover:bg-gray-800 rounded-lg">
-          <Settings size={20} /> {isOpen && "Settings"}
-        </Link>
-      </nav>
+      {/* Footer */}
+      <motion.div
+        animate={{ opacity: open ? 1 : 0 }}
+        className="text-white-200 text-sm text-center"
+      >
+        {open && "© 2025 Your Company"}
+      </motion.div>
+    </motion.div>
+  );
+};
 
-      {/* Footer Section */}
-      <div className="p-4 text-center text-gray-400 text-sm">
-        © 2025 Your Company
-      </div>
+// Mobile Sidebar
+const MobileSidebar = () => {
+  const { open, setOpen } = useSidebar();
+
+  return (
+    <div className="md:hidden p-4 bg-[#5C4033] text-white flex justify-between items-center">
+      <button onClick={() => setOpen(!open)}>
+        <Menu size={24} />
+      </button>
+
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            key="mobile-sidebar"
+            initial={{ x: "-100%" }}
+            animate={{ x: 0 }}
+            exit={{ x: "-100%" }}
+            transition={{ duration: 0.3 }}
+            className="fixed top-0 left-0 h-full w-64 bg-[#5C4033] text-white p-4 z-50 flex flex-col justify-between"
+          >
+            <div>
+              <div className="flex justify-between items-center mb-6">
+                <span className="text-xl font-bold">Certificate Dashboard</span>
+                <X size={24} onClick={() => setOpen(false)} />
+              </div>
+
+              <nav className="space-y-2">
+                <SidebarLink
+                  to="/user/dashboard"
+                  Icon={LayoutDashboard}
+                  label="Dashboard"
+                />
+                <SidebarLink
+                  to="/user/certificates"
+                  Icon={FileText}
+                  label="Certificates"
+                />
+                <SidebarLink
+                  to="/user/analytics"
+                  Icon={BarChart3}
+                  label="Analytics"
+                />
+                <SidebarLink
+                  to="/user/settings"
+                  Icon={Settings}
+                  label="Settings"
+                />
+              </nav>
+            </div>
+
+            <div className="text-white-200 text-sm text-center mt-6">
+              © 2025 Your Company
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
+  );
+};
+
+// Updated SidebarLink Component (Dynamic Icon Size)
+const SidebarLink = ({
+  to,
+  Icon,
+  label,
+}: {
+  to: string;
+  Icon: React.ElementType;
+  label: string;
+}) => {
+  const { open } = useSidebar();
+  const iconSize = open ? 20 : 28;
+
+  return (
+    <Link
+      to={to}
+      className="flex items-center gap-4 px-4 py-3 hover:bg-[#41322b] rounded-lg transition-all duration-200"
+    >
+      <Icon size={iconSize} />
+      {open && <span>{label}</span>}
+    </Link>
   );
 };
 
