@@ -12,7 +12,7 @@ interface PieChartComponentProps {
 
 const PieChartComponent: React.FC<PieChartComponentProps> = ({ data, colors }) => {
   return (
-    <div className="mt-6 bg-gray-50 p-4 shadow rounded-lg flex flex-col items-center">
+    <div className="mt-6 bg-[#fdfaf5]  p-4 shadow rounded-lg flex flex-col items-center">
       <h2 className="text-lg font-semibold mb-2">Certificate Categories</h2>
       <ResponsiveContainer width={300} height={300}>
         <PieChart>

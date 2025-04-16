@@ -12,7 +12,7 @@ interface LineChartComponentProps {
 
 const LineChartComponent: React.FC<LineChartComponentProps> = ({ data }) => {
   return (
-    <div className="mt-6 bg-gray-50 p-4 shadow rounded-lg">
+    <div className="mt-6 bg-[#fdfaf5]  p-4 shadow rounded-lg">
       <h2 className="text-lg font-semibold">Issued vs. Received Certificates (Monthly)</h2>
       <ResponsiveContainer width="100%" height={300}>
         <LineChart data={data}>

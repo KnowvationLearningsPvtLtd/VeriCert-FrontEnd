@@ -5,10 +5,12 @@ import { useSetRecoilState } from "recoil";
 import { authState } from "../store/authAtom";
 import { CheckCircle } from "lucide-react";
 import { AuthUser } from "@/types/authTypes";
+import { motion } from "framer-motion";
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState<string>('');
   const [password, setPassword] = useState<string>('');
+  const [errorMessage, setErrorMessage] = useState<string>('');  // Error message state
   const navigate = useNavigate();
   const setAuth = useSetRecoilState(authState);
 
@@ -16,7 +18,7 @@ const Login: React.FC = () => {
     e.preventDefault();
     try {
       const response = await axios.post('http://localhost:2000/api/auth/login', { email, password });
-      console.log("Login Response:", response.data);
+
       if (response.status === 200 && response.data.token) {
         const user: AuthUser = {
           id: response.data.user._id,
@@ -31,87 +33,88 @@ const Login: React.FC = () => {
           token: response.data.token,
         });
 
-        
-        console.log("Updated Auth State:", {
-          isAuthenticated: true,
-          user: {
-            id: response.data?.user?._id,
-            username: response.data?.user?.username,
-            email: response.data?.user?.email,
-            role: response.data?.user?.role,
-          },
-          token: response.data?.token,
-        });
-        
-        console.log("Updated Auth State:", user);
-       
-        // Redirect based on role
         if (user.role === "user") {
-          console.log("Navigating to /user/dashboard...");
           navigate("/user/dashboard");
         } else if (user.role === "issuer" || user.role === "organization") {
-          console.log("Navigating to /issuer/dashboard...");
           navigate("/issuer/dashboard");
         } else {
-          console.log("Invalid role. Redirecting to login.");
           navigate("/");
         }
       }
     } catch (error) {
+      setErrorMessage('Incorrect email or password. Please try again.');  // Set error message on login failure
       console.error("Login failed:", error);
     }
   };
-        
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4 bg-gradient-to-br from-blue-300 via-blue-100 to-blue-300">
-      <div className="w-full max-w-md">
+    <div className="min-h-screen flex items-center justify-center px-4 bg-[#fdfaf5]">
+      <div className="w-full max-w-md bg-white shadow-xl rounded-xl p-8">
+        {/* Logo Section */}
         <div className="flex items-center justify-center mb-6">
-          <CheckCircle className="h-8 w-8 text-blue-600 mr-2" />
-          <h1 className="text-2xl font-bold text-blue-700">VeriCert</h1></div>
-      <div className="bg-white shadow-lg rounded-lg p-8 w-full max-w-md">
-        
-        <h2 className="text-2xl font-bold text-center mb-4">Login</h2>
-        <form onSubmit={handleSubmit} className="space-y-4">
+          <CheckCircle className="h-8 w-8 text-[#260e03] mr-2" />
+          <h1 className="text-3xl font-bold text-[#5C4033] tracking-tight">VeriCert</h1>
+        </div>
+
+        {/* Login Header */}
+        <h2 className="text-xl font-semibold text-[#5C4033] text-center mb-6">Welcome Back</h2>
+
+        {/* Error Message */}
+        {errorMessage && (
+          <div className="text-red-600 text-center mb-4">
+            {errorMessage}
+          </div>
+        )}
+
+        {/* Login Form */}
+        <form onSubmit={handleSubmit} className="space-y-5">
+          {/* Email Input */}
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700">Email</label>
+            <label htmlFor="email" className="block text-sm font-medium text-[#5C4033] mb-1">Email</label>
             <input 
               id="email"
-              name="email"
               type="email"
-              placeholder="Enter your email"
-              className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500"
+              value={email}
+              placeholder="example@email.com"
               onChange={(e: ChangeEvent<HTMLInputElement>) => setEmail(e.target.value)}
+              className="w-full px-4 py-2 border border-[#5C4033] rounded-lg focus:ring-2 focus:ring-[#5C4033] focus:outline-none transition"
               required
             />
           </div>
 
+          {/* Password Input */}
           <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700">Password</label>
+            <label htmlFor="password" className="block text-sm font-medium text-[#5C4033] mb-1">Password</label>
             <input 
               id="password"
-              name="password"
               type="password"
-              placeholder="Enter your password"
-              className="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500"
+              value={password}
+              placeholder="********"
               onChange={(e: ChangeEvent<HTMLInputElement>) => setPassword(e.target.value)}
+              className="w-full px-4 py-2 border border-[#5C4033] rounded-lg focus:ring-2 focus:ring-[#5C4033] focus:outline-none transition"
               required
             />
           </div>
 
-          <button 
+          {/* Submit Button with Animation */}
+          <motion.button 
+            whileHover={{ scale: 1.1 }}
+            transition={{ type: "spring", stiffness: 300 }}
             type="submit"
-            className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 transition"
+            className="w-full py-2 px-4 bg-[#5C4033] text-white font-semibold rounded-lg hover:bg-opacity-90 transition-colors duration-300"
           >
-            Login
-          </button>
+            Log In
+          </motion.button>
         </form>
-        
-        <p className="text-center text-sm text-gray-600 mt-4">
-          Don't have an account? <Link to="/signup" className="text-blue-600 hover:underline">Register</Link>
+
+        {/* Register Link */}
+        <p className="text-sm text-center text-[#5C4033] mt-4">
+          Don’t have an account?{' '}
+          <Link to="/signup" className="text-[#5C4033] underline font-medium hover:text-opacity-80">
+            Register
+          </Link>
         </p>
       </div>
-    </div>
     </div>
   );
 };

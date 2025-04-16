@@ -14,7 +14,7 @@ const IssuedOverTimeChart: React.FC<IssuedOverTimeChartProps> = ({ data }) => {
         <YAxis />
         <Tooltip />
         <Legend />
-        <Line type="monotone" dataKey="issued" stroke="#FF8042" strokeWidth={2} />
+        <Line type="monotone" dataKey="issued" stroke="#8B5E3C" strokeWidth={2} />
       </LineChart>
     </div>
   );
