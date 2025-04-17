@@ -178,7 +178,7 @@ const Profile = () => {
             transition={{ type: "spring", stiffness: 300 }}
             type="submit"
             onClick={() => setIsEditing(true)}
-            className="w-full py-2 px-4 bg-[#2c1c15] text-white font-semibold rounded-lg hover:bg-opacity-90 transition-colors duration-300"
+            className="w-full py-2 px-4 bg-[#5C4033] text-white font-semibold rounded-lg hover:bg-opacity-90 transition-colors duration-300"
           >
            EDIT PROFILE
           </motion.button>

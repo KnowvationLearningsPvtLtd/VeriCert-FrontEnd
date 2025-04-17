@@ -12,6 +12,9 @@ const Title = styled.h1`
   text-align: center;
   margin-bottom: 20px;
   color: #333;
+  font-family:"Roboto";
+  font-weight:500;
+  font-size:30px;
 `;
 
 const TemplateGrid = styled.div`
