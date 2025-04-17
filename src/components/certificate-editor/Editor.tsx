@@ -29,7 +29,7 @@ const CanvasContainer = styled.div`
 
 const ToolButton = styled.button`
   width: 100%;
-  background-color: #007bff;
+  background-color: #5C4033;
   color: white;
   border: none;
   padding: 10px;
