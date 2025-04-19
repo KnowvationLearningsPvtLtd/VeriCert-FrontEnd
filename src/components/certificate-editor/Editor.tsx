@@ -3,6 +3,8 @@ import { useParams } from 'react-router-dom';
 import styled from 'styled-components';
 import * as fabric from 'fabric';
 import jsPDF from 'jspdf';
+import * as XLSX from 'xlsx';
+import JSZip from 'jszip';
 
 const EditorContainer = styled.div`
   display: flex;
@@ -148,6 +150,49 @@ const FontSizeSlider = styled.input`
   }
 `;
 
+const ExcelUploadContainer = styled.div`
+  margin-top: 20px;
+  padding: 15px;
+  border: 2px dashed #ccc;
+  border-radius: 4px;
+  text-align: center;
+`;
+
+const ExcelUploadButton = styled.button`
+  background-color: #28a745;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-top: 10px;
+  
+  &:hover {
+    background-color: #218838;
+  }
+`;
+
+const PlaceholderList = styled.div`
+  margin-top: 20px;
+  padding: 10px;
+  background-color: #f8f9fa;
+  border-radius: 4px;
+`;
+
+const PlaceholderItem = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 5px;
+  margin: 5px 0;
+  background-color: white;
+  border-radius: 4px;
+`;
+
+interface ExcelData {
+  [key: string]: string;
+}
+
 const Editor: React.FC = () => {
   const { templateId } = useParams();
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -156,6 +201,9 @@ const Editor: React.FC = () => {
   const [selectedColor, setSelectedColor] = useState('#000000');
   const [selectedFont, setSelectedFont] = useState('Arial');
   const [fontSize, setFontSize] = useState(20);
+  const [excelData, setExcelData] = useState<ExcelData[]>([]);
+  const [placeholders, setPlaceholders] = useState<string[]>([]);
+  const [isGenerating, setIsGenerating] = useState(false);
 
   // List of formal and stylish fonts
   const fontOptions = [
@@ -481,6 +529,170 @@ const Editor: React.FC = () => {
     }
   };
 
+  const handleExcelUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const data = new Uint8Array(e.target?.result as ArrayBuffer);
+          const workbook = XLSX.read(data, { type: 'array' });
+          const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+          const jsonData = XLSX.utils.sheet_to_json(firstSheet) as ExcelData[];
+          setExcelData(jsonData);
+          
+          // Extract placeholders from the first row
+          if (jsonData.length > 0) {
+            const headers = Object.keys(jsonData[0]);
+            setPlaceholders(headers);
+          }
+        } catch (error) {
+          console.error('Error parsing Excel file:', error);
+          alert('Error parsing Excel file. Please make sure it\'s a valid Excel file.');
+        }
+      };
+      reader.readAsArrayBuffer(file);
+    }
+  };
+
+  const addPlaceholder = (placeholder: string) => {
+    if (fabricCanvasRef.current) {
+      const text = new fabric.IText(`{{${placeholder}}}`, {
+        left: 100,
+        top: 100,
+        fontFamily: selectedFont,
+        fontSize: fontSize,
+        fill: selectedColor,
+        selectable: true,
+        evented: true,
+        width: 600,
+        textAlign: 'left',
+        splitByGrapheme: true,
+        editable: true,
+      });
+      fabricCanvasRef.current.add(text);
+      fabricCanvasRef.current.setActiveObject(text);
+      fabricCanvasRef.current.renderAll();
+    }
+  };
+
+  const generateBulkCertificates = async () => {
+    if (!fabricCanvasRef.current || excelData.length === 0) {
+      alert('Please upload Excel data first');
+      return;
+    }
+
+    setIsGenerating(true);
+    const zip = new JSZip();
+
+    try {
+      for (let i = 0; i < excelData.length; i++) {
+        const data = excelData[i];
+        const canvas = fabricCanvasRef.current;
+        
+        // Create a clone of the canvas
+        const clonedCanvas = new fabric.Canvas(document.createElement('canvas'), {
+          width: canvas.width,
+          height: canvas.height,
+        });
+
+        // Clone all objects from the original canvas
+        const objects = canvas.getObjects();
+        objects.forEach(obj => {
+          if (obj.type === 'i-text') {
+            let text = obj.get('text') as string;
+            // Replace placeholders with actual data
+            placeholders.forEach(placeholder => {
+              const regex = new RegExp(`{{${placeholder}}}`, 'g');
+              text = text.replace(regex, data[placeholder] || '');
+            });
+            
+            // Create new text object with explicit properties
+            const clonedText = new fabric.IText(text, {
+              left: obj.left,
+              top: obj.top,
+              fontFamily: obj.fontFamily,
+              fontSize: obj.fontSize,
+              fill: obj.fill,
+              width: obj.width,
+              textAlign: obj.textAlign,
+              selectable: obj.selectable,
+              evented: obj.evented,
+              lockMovementX: obj.lockMovementX,
+              lockMovementY: obj.lockMovementY,
+              lockRotation: obj.lockRotation,
+              lockScalingX: obj.lockScalingX,
+              lockScalingY: obj.lockScalingY,
+              hasBorders: obj.hasBorders,
+              hasControls: obj.hasControls,
+              splitByGrapheme: obj.splitByGrapheme,
+              editable: obj.editable,
+            });
+            clonedCanvas.add(clonedText);
+          } else if (obj.type === 'image') {
+            // Handle image objects (logos and signatures)
+            const imgObj = obj as fabric.Image;
+            const imgElement = imgObj.getElement();
+            if (imgElement) {
+              // Create new image object with explicit properties
+              const clonedImg = new fabric.Image(imgElement, {
+                left: imgObj.left,
+                top: imgObj.top,
+                scaleX: imgObj.scaleX,
+                scaleY: imgObj.scaleY,
+                selectable: imgObj.selectable,
+                evented: imgObj.evented,
+                lockMovementX: imgObj.lockMovementX,
+                lockMovementY: imgObj.lockMovementY,
+                lockRotation: imgObj.lockRotation,
+                lockScalingX: imgObj.lockScalingX,
+                lockScalingY: imgObj.lockScalingY,
+                hasBorders: imgObj.hasBorders,
+                hasControls: imgObj.hasControls,
+                crossOrigin: 'anonymous'
+              });
+              clonedCanvas.add(clonedImg);
+            }
+          }
+        });
+
+        // Generate PDF
+        const dataURL = clonedCanvas.toDataURL({
+          format: 'png',
+          multiplier: 1,
+        });
+
+        const pdf = new jsPDF({
+          orientation: 'landscape',
+          unit: 'px',
+          format: [800, 600],
+        });
+
+        pdf.addImage(dataURL, 'PNG', 0, 0, 800, 600);
+        const pdfBlob = pdf.output('blob');
+        
+        // Add to zip
+        zip.file(`certificate_${i + 1}.pdf`, pdfBlob);
+      }
+
+      // Generate and download zip
+      const zipBlob = await zip.generateAsync({ type: 'blob' });
+      const url = URL.createObjectURL(zipBlob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = 'certificates.zip';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Error generating certificates:', error);
+      alert('Error generating certificates. Please try again.');
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
   return (
     <EditorContainer>
       <Sidebar>
@@ -521,6 +733,46 @@ const Editor: React.FC = () => {
         </FontSizeControl>
         
         <ToolButton onClick={downloadPDF}>Download PDF</ToolButton>
+        
+        <ExcelUploadContainer>
+          <h3>Bulk Generation</h3>
+          <input
+            type="file"
+            accept=".xlsx,.xls"
+            onChange={handleExcelUpload}
+            style={{ display: 'none' }}
+            id="excel-upload"
+          />
+          <ExcelUploadButton as="label" htmlFor="excel-upload">
+            Upload Excel File
+          </ExcelUploadButton>
+          
+          {placeholders.length > 0 && (
+            <PlaceholderList>
+              <h4>Available Placeholders</h4>
+              {placeholders.map((placeholder) => (
+                <PlaceholderItem key={placeholder}>
+                  <span>{placeholder}</span>
+                  <button
+                    onClick={() => addPlaceholder(placeholder)}
+                    className="px-2 py-1 bg-blue-500 text-white rounded text-sm"
+                  >
+                    Add
+                  </button>
+                </PlaceholderItem>
+              ))}
+            </PlaceholderList>
+          )}
+          
+          {excelData.length > 0 && (
+            <ToolButton
+              onClick={generateBulkCertificates}
+              disabled={isGenerating}
+            >
+              {isGenerating ? 'Generating...' : 'Generate All Certificates'}
+            </ToolButton>
+          )}
+        </ExcelUploadContainer>
       </Sidebar>
       <CanvasContainer>
         <canvas ref={canvasRef} />
