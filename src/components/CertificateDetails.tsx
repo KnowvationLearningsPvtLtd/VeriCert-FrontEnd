@@ -2,9 +2,15 @@ import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import axios from 'axios';
 
+interface Certificate {
+  certificateId: string;
+  templateId: string;
+  data: Record<string, any>;
+}
+
 const CertificateDetails: React.FC = () => {
   const { id } = useParams<{ id: string }>();
-  const [certificate, setCertificate] = useState<any>(null);
+  const [certificate, setCertificate] = useState<Certificate | null>(null);
   const [error, setError] = useState<string>('');
 
   useEffect(() => {

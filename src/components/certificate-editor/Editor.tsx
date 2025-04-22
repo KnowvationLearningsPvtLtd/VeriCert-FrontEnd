@@ -194,6 +194,12 @@ interface ExcelData {
   [key: string]: string;
 }
 
+interface Certificate {
+  certificateId: string;
+  templateId: string;
+  data: Record<string, any>;
+}
+
 const Editor: React.FC = () => {
   const { templateId } = useParams();
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -582,10 +588,9 @@ const Editor: React.FC = () => {
       alert('Please upload Excel data first');
       return;
     }
-
+    let certificates: Certificate[] = [];
     setIsGenerating(true);
     const zip = new JSZip();
-    let certificates: any[] = []; // Define certificates outside the try block
 
     try {
       certificates = excelData.map((data, index) => {
