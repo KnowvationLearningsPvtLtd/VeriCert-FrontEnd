@@ -1,13 +1,19 @@
-import { authState } from '@/store/authAtom';
+import React from 'react';
 import { Navigate, Outlet } from 'react-router-dom';
 import { useRecoilValue } from 'recoil';
+import { authState } from '../store/authAtom';
 
-const ProtectedRoute = () => {
-  const authUser = useRecoilValue(authState);
+interface ProtectedRouteProps {
+  allowedRoles: string[];
+}
 
-  // ✅ Properly check if user is authenticated
-  if (!authUser.isAuthenticated || !authUser.token) {
-    return <Navigate to="/" replace />;
+const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ allowedRoles }) => {
+  const auth = useRecoilValue(authState);
+
+  const userRole = auth.user?.role || '';
+
+  if (!auth.isAuthenticated || !allowedRoles.includes(userRole)) {
+    return <Navigate to="/" />;
   }
 
   return <Outlet />;

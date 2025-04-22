@@ -18,6 +18,7 @@ import LandingPage from "../src/pages/LandingPage";
 import Editor from "./components/certificate-editor/Editor";
 import TemplateSelection from "./components/certificate-editor/TemplateSelection";
 import IssuerProfile from "./pages/IssuerProfile";
+import CertificateDetails from "./components/CertificateDetails";
 
 function App() {
   return (
@@ -66,6 +67,7 @@ function App() {
         >
           <Route path="dashboard" element={<IssuerDashboard />} />
           <Route path="certificates" element={<IssuerCertificates />} />
+          <Route path="certificates/:id" element={<CertificateDetails />} />
           <Route path="approvals" element={<IssuerApprovals />} />
           <Route path="certificate-editor" element={<TemplateSelection />} />
           <Route path="certificate-editor/:templateId" element={<Editor />} />

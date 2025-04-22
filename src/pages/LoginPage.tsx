@@ -33,6 +33,10 @@ const Login: React.FC = () => {
           token: response.data.token,
         });
 
+        // Store the token in local storage
+        localStorage.setItem('authToken', response.data.token);
+        console.log('Token stored:', response.data.token);
+
         if (user.role === "user") {
           navigate("/user/dashboard");
         } else if (user.role === "issuer" || user.role === "organization") {
@@ -109,7 +113,7 @@ const Login: React.FC = () => {
 
         {/* Register Link */}
         <p className="text-sm text-center text-[#5C4033] mt-4">
-          Don’t have an account?{' '}
+          Don't have an account?{' '}
           <Link to="/signup" className="text-[#5C4033] underline font-medium hover:text-opacity-80">
             Register
           </Link>
