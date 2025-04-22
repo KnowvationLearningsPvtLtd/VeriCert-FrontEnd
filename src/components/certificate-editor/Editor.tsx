@@ -5,6 +5,7 @@ import * as fabric from 'fabric';
 import jsPDF from 'jspdf';
 import * as XLSX from 'xlsx';
 import JSZip from 'jszip';
+import axios from 'axios';
 
 const EditorContainer = styled.div`
   display: flex;
@@ -584,38 +585,35 @@ const Editor: React.FC = () => {
 
     setIsGenerating(true);
     const zip = new JSZip();
+    let certificates: any[] = []; // Define certificates outside the try block
 
     try {
-      for (let i = 0; i < excelData.length; i++) {
-        const data = excelData[i];
+      certificates = excelData.map((data, index) => {
         const canvas = fabricCanvasRef.current;
-        
-        // Create a clone of the canvas
+        if (!canvas) return null;
+
         const clonedCanvas = new fabric.Canvas(document.createElement('canvas'), {
           width: canvas.width,
           height: canvas.height,
         });
 
-        // Clone all objects from the original canvas
         const objects = canvas.getObjects();
         objects.forEach(obj => {
           if (obj.type === 'i-text') {
             let text = obj.get('text') as string;
-            // Replace placeholders with actual data
             placeholders.forEach(placeholder => {
               const regex = new RegExp(`{{${placeholder}}}`, 'g');
               text = text.replace(regex, data[placeholder] || '');
             });
-            
-            // Create new text object with explicit properties
+
             const clonedText = new fabric.IText(text, {
               left: obj.left,
               top: obj.top,
-              fontFamily: obj.fontFamily,
-              fontSize: obj.fontSize,
+              fontFamily: (obj as fabric.IText).fontFamily,
+              fontSize: (obj as fabric.IText).fontSize,
               fill: obj.fill,
               width: obj.width,
-              textAlign: obj.textAlign,
+              textAlign: (obj as fabric.IText).textAlign,
               selectable: obj.selectable,
               evented: obj.evented,
               lockMovementX: obj.lockMovementX,
@@ -625,16 +623,13 @@ const Editor: React.FC = () => {
               lockScalingY: obj.lockScalingY,
               hasBorders: obj.hasBorders,
               hasControls: obj.hasControls,
-              splitByGrapheme: obj.splitByGrapheme,
-              editable: obj.editable,
+              editable: (obj as fabric.IText).editable,
             });
             clonedCanvas.add(clonedText);
           } else if (obj.type === 'image') {
-            // Handle image objects (logos and signatures)
             const imgObj = obj as fabric.Image;
             const imgElement = imgObj.getElement();
             if (imgElement) {
-              // Create new image object with explicit properties
               const clonedImg = new fabric.Image(imgElement, {
                 left: imgObj.left,
                 top: imgObj.top,
@@ -643,12 +638,12 @@ const Editor: React.FC = () => {
                 selectable: imgObj.selectable,
                 evented: imgObj.evented,
                 lockMovementX: imgObj.lockMovementX,
-                lockMovementY: imgObj.lockMovementY,
-                lockRotation: imgObj.lockRotation,
-                lockScalingX: imgObj.lockScalingX,
-                lockScalingY: imgObj.lockScalingY,
-                hasBorders: imgObj.hasBorders,
-                hasControls: imgObj.hasControls,
+                lockMovementY: obj.lockMovementY,
+                lockRotation: obj.lockRotation,
+                lockScalingX: obj.lockScalingX,
+                lockScalingY: obj.lockScalingY,
+                hasBorders: obj.hasBorders,
+                hasControls: obj.hasControls,
                 crossOrigin: 'anonymous'
               });
               clonedCanvas.add(clonedImg);
@@ -656,23 +651,49 @@ const Editor: React.FC = () => {
           }
         });
 
-        // Generate PDF
         const dataURL = clonedCanvas.toDataURL({
           format: 'png',
           multiplier: 1,
         });
 
-        const pdf = new jsPDF({
-          orientation: 'landscape',
-          unit: 'px',
-          format: [800, 600],
-        });
+        zip.file(`certificate_${index + 1}.png`, dataURL.split(',')[1], { base64: true });
 
-        pdf.addImage(dataURL, 'PNG', 0, 0, 800, 600);
-        const pdfBlob = pdf.output('blob');
-        
-        // Add to zip
-        zip.file(`certificate_${i + 1}.pdf`, pdfBlob);
+        const certificateId = Math.floor(100000 + Math.random() * 900000).toString();
+        return {
+          certificateId,
+          templateId,
+          data,
+        };
+      }).filter(cert => cert !== null);
+
+      console.log('Certificates to send:', certificates);
+
+      // Retrieve the token from local storage or wherever it's stored
+      const token = localStorage.getItem('authToken'); // Adjust this line based on where you store the token
+      console.log('Token:', token); // Log the token to verify its format
+
+      // Check if the token is valid
+      if (!token || token.split('.').length !== 3) {
+        console.error('Invalid token format:', token);
+        alert('Invalid token. Please log in again.');
+        return;
+      }
+
+      // Send certificates to the back-end
+      try {
+        const response = await axios.post('http://localhost:2000/issuer/certificates', 
+          { certificates, templateId },
+          {
+            headers: {
+              Authorization: `Bearer ${token}` // Include the token in the headers
+            }
+          }
+        );
+        console.log('Response from server:', response.data);
+      } catch (error) {
+        console.error('Error sending certificates to backend:', error);
+        alert('Failed to send certificates to the server. Please check your network connection and try again.');
+        return; // Exit if there's an error sending data to the backend
       }
 
       // Generate and download zip
@@ -685,6 +706,8 @@ const Editor: React.FC = () => {
       link.click();
       document.body.removeChild(link);
       URL.revokeObjectURL(url);
+
+      alert('Certificates generated, stored, and downloaded successfully.');
     } catch (error) {
       console.error('Error generating certificates:', error);
       alert('Error generating certificates. Please try again.');
@@ -769,7 +792,7 @@ const Editor: React.FC = () => {
               onClick={generateBulkCertificates}
               disabled={isGenerating}
             >
-              {isGenerating ? 'Generating...' : 'Generate All Certificates'}
+              {isGenerating ? 'Generating...' : 'Generate and Download'}
             </ToolButton>
           )}
         </ExcelUploadContainer>

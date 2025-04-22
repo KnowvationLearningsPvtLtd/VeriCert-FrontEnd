@@ -7,6 +7,7 @@ import Notifications from "../pages/Notifications";
 import Profile from "../pages/Profile";
 import Settings from "../pages/Settings";
 import Editor from "../components/certificate-editor/Editor";
+import CertificateDetails from "../components/CertificateDetails";
 
 export default function AppRoutes() {
   return (
@@ -20,6 +21,7 @@ export default function AppRoutes() {
         <Route path="/notifications" element={<Notifications />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/settings" element={<Settings />} />
+        <Route path="/certificates/:id" element={<CertificateDetails />} />
       </Routes>
     </Router>
   );
