@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link } from "react-router-dom"; 
 import { BarChart3, Users2, Building2 } from "lucide-react";
 import {
   BarChart,
@@ -99,7 +99,7 @@ const LandingPage = () => {
         <div className="space-x-3">
           <Link to="/signup">
             <motion.button
-              whileHover={{ scale: 1.1 }}
+              whileHover={{ scale: 1.1, backgroundColor: "#3e2a1c" }}
               transition={{ type: "spring", stiffness: 300 }}
               className="bg-[#5C4033] text-white px-4 py-1 rounded-md"
             >
@@ -108,7 +108,7 @@ const LandingPage = () => {
           </Link>
           <Link to="/login">
             <motion.button
-              whileHover={{ scale: 1.1 }}
+              whileHover={{ scale: 1.1, backgroundColor: "#f1eae2" }}
               transition={{ type: "spring", stiffness: 300 }}
               className="border border-[#5C4033] text-[#5C4033] px-4 py-1 rounded-md"
             >
@@ -133,8 +133,8 @@ const LandingPage = () => {
             Easily{" "}
             <FlipWords
               words={["MANAGE", "ISSUE", "VERIFY"]}
-              duration={3000}
-              className="text-brown-1000"
+              duration={3000} // Adjust the duration for each flip
+              className="text-brown-1000" // Optional: add styling
             />{" "}
             certificates with real-time insights and trust.
           </div>
@@ -142,7 +142,7 @@ const LandingPage = () => {
           <div className="mt-6 z-20">
             <Link to="/signup">
               <motion.button
-                whileHover={{ scale: 1.1 }}
+                whileHover={{ scale: 1.1, backgroundColor: "#3e2a1c" }}
                 transition={{ type: "spring", stiffness: 300 }}
                 className="bg-[#5C4033] text-white px-6 py-2 rounded"
               >
@@ -211,6 +211,23 @@ const LandingPage = () => {
               </RePieChart>
             </ResponsiveContainer>
           </div>
+        </div>
+      </section>
+      {/* Courses Section */}
+      <section id="courses" className="bg-[#f9f5ef] py-14 px-6 md:px-20">
+        <h2 className="text-3xl font-bold text-center mb-8 text-[#5C4033]">Courses</h2>
+        <p className="text-center max-w-2xl mx-auto text-[#5C4033] text-sm md:text-lg">
+          Explore a variety of certification-related courses designed to enhance your credibility and skills.
+        </p>
+      </section>
+
+      {/* Contact Section */}
+      <section id="contact" className="bg-[#fdf9f4] py-14 px-6 md:px-20">
+        <h2 className="text-3xl font-bold text-center mb-8 text-[#5C4033]">Contact Us</h2>
+        <div className="max-w-xl mx-auto text-center text-[#5C4033]">
+          <p>Email: <a href="mailto:support@vericert.com" className="underline">support@vericert.com</a></p>
+          <p className="mt-2">Phone: +91 98765 43210</p>
+          <p className="mt-2">We'd love to hear from you. Reach out with any questions or feedback!</p>
         </div>
       </section>
     </div>
