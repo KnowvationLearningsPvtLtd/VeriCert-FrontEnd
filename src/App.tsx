@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, useParams } from "react-router-dom";
 import UserLayout from "./features/dashboard/components/UserLayout";
 import IssuerLayout from "./features/dashboard/components/IssuerLayout";
 import UserDashboard from "./pages/UserDashboard";
@@ -21,6 +21,8 @@ import IssuerProfile from "./pages/IssuerProfile";
 import CertificateDetails from "./components/CertificateDetails";
 
 function App() {
+  const { certificateId } = useParams();
+
   return (
     <BrowserRouter>
       <Routes>
@@ -67,7 +69,7 @@ function App() {
         >
           <Route path="dashboard" element={<IssuerDashboard />} />
           <Route path="certificates" element={<IssuerCertificates />} />
-          <Route path="certificates/:id" element={<CertificateDetails />} />
+          <Route path="certificates/:certificateId" element={<CertificateDetails />} />
           <Route path="approvals" element={<IssuerApprovals />} />
           <Route path="certificate-editor" element={<TemplateSelection />} />
           <Route path="certificate-editor/:templateId" element={<Editor />} />
