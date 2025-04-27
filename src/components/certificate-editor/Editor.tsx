@@ -661,7 +661,7 @@ const Editor: React.FC = () => {
           multiplier: 1,
         });
 
-        zip.file(`certificate_${index + 1}.png`, dataURL.split(',')[1], { base64: true });
+        zip.file(`certificate_${index + 1}.pdf`, dataURL.split(',')[1], { base64: true });
 
         const certificateId = Math.floor(100000 + Math.random() * 900000).toString();
         return {
