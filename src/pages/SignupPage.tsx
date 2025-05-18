@@ -25,21 +25,8 @@ const Signup: React.FC = () => {
         role,
       });
 
-      if (response.data.status === 'success') {
-        const user: AuthUser = {
-          id: response.data.user.id,
-          username: response.data.user.username,
-          email: response.data.user.email,
-          role: response.data.user.role,
-        };
-        setAuth({
-          isAuthenticated: true,
-          user: user,
-          token: response.data.token,
-        });
-
-        localStorage.setItem("token", response.data.token);
-        navigate("/home");
+      if (response.status === 201) {
+        navigate("/login"); // ✅ Redirect to login
       } else {
         alert(response.data.message || "Signup failed. Please try again.");
       }
@@ -48,7 +35,6 @@ const Signup: React.FC = () => {
       alert("An error occurred. Please check your details and try again.");
     }
   };
-
   return (
     <div className="min-h-screen flex items-center justify-center p-4 bg-[#fdfaf5]">
       <div className="w-full max-w-md">
